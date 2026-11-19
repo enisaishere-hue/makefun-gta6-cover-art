@@ -1,12 +1,254 @@
-html, body { margin: 0; height: 100%; background: #f2f0f4; color: #1d1b22; font: 15px/1.4 system-ui, sans-serif; }
-.app { display: flex; gap: 32px; align-items: center; justify-content: center; height: 100%; padding: 24px; box-sizing: border-box; }
-.controls { display: flex; flex-direction: column; gap: 14px; width: 280px; }
-.controls h1 { margin: 0; font-size: 28px; }
-.controls p { margin: 0; color: #5c5866; }
-label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
-input[type=text] { font: inherit; padding: 8px; border: 1px solid #c9c4d1; border-radius: 6px; }
-button { font: inherit; font-weight: 700; padding: 10px; border: 0; border-radius: 6px; background: #1d1b22; color: #fff; cursor: pointer; }
-canvas { width: min(70vh, 60vw); height: min(70vh, 60vw); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); }
-body.shot-cover .controls { display: none; }
-body.shot-cover .app { padding: 0; }
-body.shot-cover canvas { width: 100vw; height: 100vh; box-shadow: none; }
+/* style.css — the editor chrome for Sunset Cover Studio.
+   The poster lettering itself is the Anton font, loaded below from the
+   app's own fonts folder; the interface uses the system font stack. */
+
+@font-face {
+  font-family: "Anton";
+  src: url("fonts/Anton-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg: #14101c;
+  --panel: #1e1828;
+  --panel-2: #262032;
+  --line: #3a3049;
+  --text: #f4eefc;
+  --muted: #b3a8c4;
+  --accent: #ff7a3d;
+  --accent-2: #ff2e88;
+  --gold: #ffd166;
+  --focus: #6ef3ff;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  min-height: 100vh;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+  background: linear-gradient(90deg, #2b1533, #1e1828 60%, #12303a);
+  border-bottom: 1px solid var(--line);
+}
+
+.brand { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+
+.brand-mark {
+  font-family: "Anton", "Arial Narrow", sans-serif;
+  font-size: 20px;
+  letter-spacing: 1px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+.brand-name {
+  font-family: "Anton", "Arial Narrow", sans-serif;
+  font-size: 20px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.brand-tag { color: var(--muted); font-size: 13px; }
+
+.export-button {
+  font-family: "Anton", "Arial Narrow", sans-serif;
+  font-size: 17px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #1a0d00;
+  background: linear-gradient(135deg, var(--gold), var(--accent));
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  cursor: pointer;
+}
+
+.export-button:hover { filter: brightness(1.1); }
+.export-button:disabled { opacity: 0.6; cursor: wait; }
+
+.workspace {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 0;
+  align-items: start;
+}
+
+.controls {
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  padding: 16px 18px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: calc(100vh - 57px);
+}
+
+.control-group h2 {
+  font-family: "Anton", "Arial Narrow", sans-serif;
+  font-size: 15px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 6px;
+}
+
+.hint { color: var(--muted); margin: 0 0 10px; font-size: 13px; }
+
+.button-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.choice {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 11px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.choice:hover { border-color: var(--accent); }
+.choice.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #1a0d00;
+  font-weight: 700;
+}
+
+.swatches .choice {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--swatch, #fff);
+  color: transparent;
+  overflow: hidden;
+}
+
+.swatches .choice.active {
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.photo-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+
+.file-button, .ghost-button {
+  display: inline-block;
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.file-button:hover, .ghost-button:hover { border-color: var(--accent); }
+.file-button.small { font-size: 12px; padding: 6px 10px; }
+
+.check-line { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+.check-row { display: flex; gap: 18px; margin: 8px 0; }
+
+.panel-tune {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.panel-label { font-weight: 700; margin: 0 0 8px; }
+
+.slider-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+}
+
+.slider-line input[type="range"] { flex: 1; accent-color: var(--accent); }
+
+.field-label { display: block; margin: 10px 0; font-weight: 600; }
+
+.field-label input[type="text"] {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  background: #14101c;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 9px 10px;
+  font-size: 14px;
+}
+
+.field-label input[type="text"]:focus {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.privacy-note {
+  color: var(--muted);
+  font-size: 12px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.preview {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+#previewCanvas {
+  max-width: 100%;
+  max-height: calc(100vh - 150px);
+  width: auto;
+  height: auto;
+  background: #000;
+  border-radius: 6px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+  cursor: grab;
+  touch-action: none;
+}
+
+#previewCanvas:active { cursor: grabbing; }
+
+.status { color: var(--muted); margin: 0; text-align: center; }
+
+/* Cover-only mode: the app shows just the finished cover, used for
+   screenshots. The editor chrome is hidden and the canvas fills the view. */
+body.cover-only { background: #000; }
+body.cover-only .topbar,
+body.cover-only .controls,
+body.cover-only .status { display: none; }
+body.cover-only .workspace { display: block; }
+body.cover-only .preview { padding: 0; }
+body.cover-only #previewCanvas {
+  max-height: 100vh;
+  border-radius: 0;
+  box-shadow: none;
+  display: block;
+}
+
+@media (max-width: 900px) {
+  .workspace { grid-template-columns: 1fr; }
+  .controls { min-height: 0; border-right: none; border-bottom: 1px solid var(--line); }
+}

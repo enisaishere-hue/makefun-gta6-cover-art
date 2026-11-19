@@ -1,23 +1,101 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Cover Snap</title>
-<link rel="stylesheet" href="./style.css">
+<title>Sunset Cover Studio — GTA-style cover art maker</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-<main class="app">
-  <section class="controls">
-    <h1>Cover Snap</h1>
-    <p>A photo and a caption, made into a square cover.</p>
-    <label>Photo <input id="photo" type="file" accept="image/*"></label>
-    <label>Caption <input id="caption" type="text" maxlength="40" value="Sunset Heist"></label>
-    <button id="export" type="button">Export PNG 1080 x 1080</button>
-    <p id="status" role="status"></p>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">SC</span>
+    <span class="brand-name">Sunset Cover Studio</span>
+    <span class="brand-tag">Turn your photo into poster cover art</span>
+  </div>
+  <button id="exportButton" class="export-button" type="button">Export PNG</button>
+</header>
+
+<main class="workspace">
+  <aside class="controls" aria-label="Cover controls">
+    <section class="control-group">
+      <h2>1 · Layout</h2>
+      <p class="hint">Pick how the cover is split into panels.</p>
+      <div id="layoutRow" class="button-row"></div>
+    </section>
+
+    <section class="control-group">
+      <h2>2 · Photos</h2>
+      <p class="hint">Add your own photos, or try a sample. Click a panel in the preview to select it, drag to move its photo, scroll to zoom.</p>
+      <div class="photo-actions">
+        <label class="file-button">
+          Add your photos…
+          <input id="photoInput" type="file" accept="image/*" multiple hidden>
+        </label>
+        <button id="sampleButton" type="button" class="ghost-button">Load sample photo</button>
+      </div>
+      <label class="check-line">
+        <input id="fillAllToggle" type="checkbox" checked>
+        One photo fills every panel
+      </label>
+      <div class="panel-tune">
+        <p id="panelLabel" class="panel-label">Panel 1 of 3</p>
+        <label class="slider-line">Zoom
+          <input id="zoomSlider" type="range" min="1" max="4" step="0.05" value="1">
+        </label>
+        <label class="slider-line">Rotate
+          <input id="rotateSlider" type="range" min="-15" max="15" step="1" value="0">
+        </label>
+        <label class="file-button small">
+          Replace this panel’s photo
+          <input id="replaceInput" type="file" accept="image/*" hidden>
+        </label>
+      </div>
+    </section>
+
+    <section class="control-group">
+      <h2>3 · Caption</h2>
+      <label class="field-label">Title
+        <input id="titleInput" type="text" value="SUNSET HEIST" maxlength="60" autocomplete="off">
+      </label>
+      <label class="field-label">Subtitle
+        <input id="subtitleInput" type="text" value="A story in neon and gold" maxlength="80" autocomplete="off">
+      </label>
+      <label class="slider-line">Title size
+        <input id="titleSize" type="range" min="0.6" max="1.5" step="0.05" value="1">
+      </label>
+      <div class="field-label">Letter colour
+        <div id="colorRow" class="button-row swatches"></div>
+      </div>
+      <div class="check-row">
+        <label class="check-line"><input id="outlineToggle" type="checkbox" checked> Outline</label>
+        <label class="check-line"><input id="glowToggle" type="checkbox" checked> Glow</label>
+      </div>
+      <div class="field-label">Caption position
+        <div id="positionRow" class="button-row"></div>
+      </div>
+    </section>
+
+    <section class="control-group">
+      <h2>4 · Colour grade</h2>
+      <div id="gradeRow" class="button-row"></div>
+    </section>
+
+    <section class="control-group">
+      <h2>5 · Export size</h2>
+      <div id="sizeRow" class="button-row"></div>
+      <p id="sizeNote" class="hint"></p>
+    </section>
+
+    <p class="privacy-note">Your photos never leave this machine. The app runs fully offline; the lettering uses the Anton font, shipped with the app under the SIL Open Font License. All artwork here is original — no game logos or artwork.</p>
+  </aside>
+
+  <section class="preview" aria-label="Live preview">
+    <canvas id="previewCanvas" width="1100" height="619"></canvas>
+    <p id="statusNote" class="status" role="status">Pick a layout, add a photo, write a caption, export.</p>
   </section>
-  <canvas id="cover" width="1080" height="1080" aria-label="The cover"></canvas>
 </main>
-<script type="module" src="./src/main.js"></script>
+
+<script type="module" src="src/main.js"></script>
 </body>
 </html>
