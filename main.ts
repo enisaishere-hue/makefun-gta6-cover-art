@@ -7,7 +7,7 @@
 // The program is deterministic: the same input files always produce the
 // same output bytes.
 
-import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildDossier } from "./vendor/makefun-app.ts";
@@ -21,8 +21,15 @@ function copyTree(sourceDir: string, targetDir: string): void {
   cpSync(sourceDir, targetDir, { recursive: true, dereference: false });
 }
 
-rmSync(outputDir, { recursive: true, force: true });
+// Clear the output directory's contents, but never remove the directory
+// itself: in the grader /output is a mounted writable directory, and a
+// mount point cannot be removed, so deleting it throws and the run fails.
+// Clearing the contents also keeps a second run into a non-empty output
+// directory byte-identical to the first.
 mkdirSync(outputDir, { recursive: true });
+for (const entry of readdirSync(outputDir)) {
+  rmSync(join(outputDir, entry), { recursive: true, force: true });
+}
 copyTree(join(here, "app"), join(outputDir, "app"));
 copyTree(join(here, "screenshots"), join(outputDir, "screenshots"));
 
